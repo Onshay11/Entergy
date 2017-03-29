@@ -63,7 +63,7 @@ node.append("image")
       .attr("height", "24px");
 
 node.append("a")
-    .attr("xlink:href", function(d) {return "http://somelink.com/link.php?id="})
+    .attr("xlink:href", function(d) {return "http://entergy.com"})
     .append("circle")
       .attr("cx", 24 )
       .attr("cy", 0 )
