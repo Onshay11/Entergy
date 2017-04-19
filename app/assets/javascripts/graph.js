@@ -7,7 +7,18 @@ var da =
         "name": "Feeder Breaker Fault",
         "children": [
         {
-            "name": "Siprotech",
+            "name": "Siprotech 1",
+            "children": [
+            {"name": "MU 1", "color": "red"},
+            {"name": "MU 2", "color": "red", "url": "http://entergy.com"}
+            ]
+        }]
+    },
+    {
+        "name": "Normalized System", "color": "green",
+        "children": [
+        {
+            "name": "Siprotech 2",
             "children": [
             {"name": "MU 1", "color": "red"},
             {"name": "MU 2", "color": "red"}
@@ -56,7 +67,9 @@ function update() {
   link.exit().remove();
 
   link.enter().insert("line", ".node")
-      .attr("class", "link");
+      .attr("class", "link")
+      .attr("stroke", linkcolor);
+      
 
   // Update nodes.
   node = node.data(nodes, function(d) { return d.id; });
@@ -69,7 +82,7 @@ function update() {
       .call(force.drag);
 
   nodeEnter.append("circle")
-      .attr("r", function(d) { return Math.sqrt(d.size) / 10 || 4.5; });
+      .attr("r", function(d) { return Math.sqrt(d.size) / 10 || 20; });
 
   nodeEnter.append("text")
       .attr("dy", ".35em")
@@ -88,10 +101,21 @@ function tick() {
   node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 }
 
+function linkcolor(d) {
+  if(d.target.name == "MU 1" && d.source.name == "Siprotech 1"){
+    return "red";
+  } else {
+    return "blue";
+  }
+  
+}
+
 function color(d) {
-  return d._children ? "#3182bd" // collapsed package
-      : d.children ? "#c6dbef" // expanded package
-      : "#fd8d3c"; // leaf node
+  if(d.name == "Start"){
+    return "blue";
+  } else {
+    return "red";
+  }
 }
 
 // Toggle children on click.
@@ -103,6 +127,7 @@ function click(d) {
   } else {
     d.children = d._children;
     d._children = null;
+    window.location.href = 'http://www.google.com';
   }
   update();
 }
