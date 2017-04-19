@@ -1,0 +1,15 @@
+{
+    "name": "Start",
+    "children": [
+    {
+        "name": "Feeder Breaker Fault",
+        "children": [
+        {
+            "name": "Siprotech",
+            "children": [
+            {"name": "MU 1", "color": "red"},
+            {"name": "MU 2", "color": "red"}
+            ]
+        }]
+    }]
+}

@@ -4,6 +4,8 @@
 Rails.application.config.assets.version = '1.0'
 Rails.application.config.assets.precompile += %w( graph.js )
 Rails.application.config.assets.precompile += %w( d3.js )
+Rails.application.config.assets.precompile += %w( stylesheet.css )
+Rails.application.config.assets.precompile += %w( data.json )
 
 # Add additional assets to the asset load path
 # Rails.application.config.assets.paths << Emoji.images_path

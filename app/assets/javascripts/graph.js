@@ -1,100 +1,122 @@
-var SEL_source = "http://www.energobit.com/USR_uploads/ContentCMS/produse/MT/protectii_SEL/Echipamente/trasp_energie/SEL-351/SEL-351_big.jpg";
-var MU_source = "http://w3.siemens.com/smartgrid/global/en/products-systems-solutions/Protection/digital-substation/PublishingImages/IC_SG_Siprotec5_7SC805_W6_sRGB.png";
+var da = 
 
-
-
-var nodes = [
-    {name: "Siprotech (1)", icon: SEL_source},
-    {name: "MU (1)", icon: MU_source, type:"signals"},
-    {name: "MU (2)", icon: MU_source, type:"signal"},
-    {name: "MU (3)", icon: MU_source, type:"signal"},
-    {name: "Switch", icon: MU_source, type:"switch"}
-    ];
-    
-var links = [
-  {source: 0, target: 1,id:"test"},
-  {source: 0, target: 2,id:"test"},
-  {source: 0, target: 3,id:"test"},
-  {source: 4, target: 1,id:"test"},
-  {source: 4, target: 2,id:"test"},
-  {source: 4, target: 3,id:"test"}
-];
+{
+    "name": "Start",
+    "children": [
+    {
+        "name": "Feeder Breaker Fault",
+        "children": [
+        {
+            "name": "Siprotech",
+            "children": [
+            {"name": "MU 1", "color": "red"},
+            {"name": "MU 2", "color": "red"}
+            ]
+        }]
+    }]
+};
 
 var width = 960,
-    height = 800;
+    height = 500,
+    root;
 
 var force = d3.layout.force()
-    .nodes(nodes)
-    .links(links)
+    .linkDistance(80)
+    .charge(-120)
+    .gravity(.05)
     .size([width, height])
-    .linkDistance(180)
-    .charge(-300)
-    .on("tick", tick)
-    .start();
+    .on("tick", tick);
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-var link = svg.selectAll(".link")
-    .data(force.links())
-    .enter().append("line")
-    .attr("class", function (d) {
-        var myClass = (d.target.type == "signal" ? "test" : "link");
-        return myClass;
-    });
+var link = svg.selectAll(".link"),
+    node = svg.selectAll(".node");
 
-var node = svg.selectAll(".node")
-    .data(force.nodes())
-    .enter().append("g")
-    .attr("class", "node")
-    .on("mouseover", mouseover)
-    .on("mouseout", mouseout)
-    .call(force.drag);
+d3.json("data.json", function(json) {
+  
+  root = da;
+  update();
+});
 
-node.append("circle")
-    .attr("r", 8);
+function update() {
+  var nodes = flatten(root),
+      links = d3.layout.tree().links(nodes);
 
-node.append("image")
-      .attr("xlink:href", function(d) { return d.icon; })
-      .attr("x", "-12px")
-      .attr("y", "-12px")
-      .attr("width", "24px")
-      .attr("height", "24px");
+  // Restart the force layout.
+  force
+      .nodes(nodes)
+      .links(links)
+      .start();
 
-node.append("a")
-    .attr("xlink:href", function(d) {return "http://entergy.com"})
-    .append("circle")
-      .attr("cx", 24 )
-      .attr("cy", 0 )
-      .attr("r", 4)
-      .style("fill", "blue")
-      .style("opacity", 0.5);
+  // Update links.
+  link = link.data(links, function(d) { return d.target.id; });
 
-node.append("text")
-    .attr("x", 32)
-    .attr("dy", ".35em")
-    .text(function(d) { return d.name; });
+  link.exit().remove();
+
+  link.enter().insert("line", ".node")
+      .attr("class", "link");
+
+  // Update nodes.
+  node = node.data(nodes, function(d) { return d.id; });
+
+  node.exit().remove();
+
+  var nodeEnter = node.enter().append("g")
+      .attr("class", "node")
+      .on("click", click)
+      .call(force.drag);
+
+  nodeEnter.append("circle")
+      .attr("r", function(d) { return Math.sqrt(d.size) / 10 || 4.5; });
+
+  nodeEnter.append("text")
+      .attr("dy", ".35em")
+      .text(function(d) { return d.name; });
+
+  node.select("circle")
+      .style("fill", color);
+}
 
 function tick() {
-  link
-      .attr("x1", function(d) { return d.source.x; })
+  link.attr("x1", function(d) { return d.source.x; })
       .attr("y1", function(d) { return d.source.y; })
       .attr("x2", function(d) { return d.target.x; })
       .attr("y2", function(d) { return d.target.y; });
 
-  node
-      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 }
 
-function mouseover() {
-  d3.select(this).select("circle").transition()
-      .duration(750)
-      .attr("r", 16);
+function color(d) {
+  return d._children ? "#3182bd" // collapsed package
+      : d.children ? "#c6dbef" // expanded package
+      : "#fd8d3c"; // leaf node
 }
 
-function mouseout() {
-  d3.select(this).select("circle").transition()
-      .duration(750)
-      .attr("r", 8);
+// Toggle children on click.
+function click(d) {
+  if (d3.event.defaultPrevented) return; // ignore drag
+  if (d.children) {
+    d._children = d.children;
+    d.children = null;
+  } else {
+    d.children = d._children;
+    d._children = null;
+  }
+  update();
+}
+
+// Returns a list of all nodes under the root.
+function flatten(root) {
+  var nodes = [], i = 0;
+
+  function recurse(node) {
+    if (node.children) node.children.forEach(recurse);
+    if (!node.id) node.id = ++i;
+    nodes.push(node);
+  }
+
+  recurse(root);
+  return nodes;
 }
