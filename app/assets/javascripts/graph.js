@@ -7,12 +7,26 @@ var da =
         "name": "Feeder Breaker Fault",
         "children": [
         {
-            "name": "Siprotech 1",
+            "name": "Siprotech In",
             "children": [
-            {"name": "MU 1", "color": "red"},
-            {"name": "MU 2", "color": "red", "url": "http://entergy.com"}
+            {"name": "Binary Input Voltage", "color": "red"},
             ]
-        }]
+        },
+        {
+          "name": "Siprotech Logic",
+          "children": [
+            {"name": "50 NI", "color": "red"},
+            {"name": "51 PI", "color": "red"},
+            {"name": "50 PI", "color": "red"}
+            ]
+        },
+        {
+          "name": "Siprotech Output", 
+          "children": [
+              {"name": "Merging Unit", "color": "red"}
+            ]
+        }
+        ]
     },
     {
         "name": "Normalized System", "color": "green",
@@ -127,7 +141,6 @@ function click(d) {
   } else {
     d.children = d._children;
     d._children = null;
-    window.location.href = 'http://www.google.com';
   }
   update();
 }
