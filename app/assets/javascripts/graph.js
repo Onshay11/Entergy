@@ -1,19 +1,19 @@
 var da = 
 
 {
-    "name": "Start",
+    "name": "Start", "color": "#33adff",
     "children": [
     {
-        "name": "Feeder Breaker Fault",
+        "name": "Feeder Breaker Fault","color": "red", 
         "children": [
         {
-            "name": "Siprotech In",
+            "name": "Siprotech In", "color": "red",
             "children": [
             {"name": "Binary Input Voltage", "color": "red"},
             ]
         },
         {
-          "name": "Siprotech Logic",
+          "name": "Siprotech Logic", "color": "red",
           "children": [
             {"name": "50 NI", "color": "red"},
             {"name": "51 PI", "color": "red"},
@@ -21,21 +21,21 @@ var da =
             ]
         },
         {
-          "name": "Siprotech Output", 
+          "name": "Siprotech Output", "color": "red",
           "children": [
-              {"name": "Merging Unit", "color": "red"}
+              {"name": "Merging Unit", "color": "red",}
             ]
         }
         ]
     },
     {
-        "name": "Normalized System", "color": "green",
+        "name": "Normalized System", "color": "#33ff33",
         "children": [
         {
-            "name": "Siprotech 2",
+            "name": "Siprotech 2", "color": "#33ff33", 
             "children": [
-            {"name": "MU 1", "color": "red"},
-            {"name": "MU 2", "color": "red"}
+            {"name": "Input", "color": "#33ff33"},
+            {"name": "Output", "color": "#33ff33"}
             ]
         }]
     }]
@@ -116,7 +116,7 @@ function tick() {
 }
 
 function linkcolor(d) {
-  if(d.target.name == "MU 1" && d.source.name == "Siprotech 1"){
+  if(d.target.name == "Merging Unit" && d.source.name == "Siprotech 1"){
     return "red";
   } else {
     return "blue";
@@ -125,11 +125,7 @@ function linkcolor(d) {
 }
 
 function color(d) {
-  if(d.name == "Start"){
-    return "blue";
-  } else {
-    return "red";
-  }
+  return d.color;
 }
 
 // Toggle children on click.
